@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>食物抽奖机</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍽️ CZX</h1>
+            <h1>Lottery Machine</h1>
+            <p class="subtitle">叮！美食机已加载完成</p>
+        </header>
+
+        <main>
+            <!-- 抽奖区域 -->
+            <section class="lottery-section">
+                <div class="lottery-display">
+                    <div class="food-card" id="lotteryCard">
+                        <div class="food-icon">🍴</div>
+                        <div class="food-name">Food</div>
+                    </div>
+                </div>
+                <button class="lottery-btn" id="lotteryBtn">
+                    <span class="btn-text">抽取</span>
+                </button>
+                <div class="current-time" id="currentTime"></div>
+            </section>
+
+            <!-- 添加食物区域 -->
+            <section class="add-section">
+                <div class="add-form">
+                    <input type="text" id="foodInput" placeholder="输入食物名称" maxlength="20">
+                    <div class="tags-group">
+                        <label class="tag-checkbox">
+                            <input type="checkbox" value="breakfast">
+                            <span class="tag-label breakfast">早餐</span>
+                        </label>
+                        <label class="tag-checkbox">
+                            <input type="checkbox" value="lunch">
+                            <span class="tag-label lunch">中餐</span>
+                        </label>
+                        <label class="tag-checkbox">
+                            <input type="checkbox" value="dinner">
+                            <span class="tag-label dinner">晚餐</span>
+                        </label>
+                    </div>
+                    <button class="add-btn" id="addBtn">添加食物</button>
+                </div>
+            </section>
+
+            <!-- 食物列表区域 -->
+            <section class="food-list-section">
+                <h2>美食列表</h2>
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-filter="all">全部</button>
+                    <button class="filter-tab" data-filter="breakfast">早餐</button>
+                    <button class="filter-tab" data-filter="lunch">中餐</button>
+                    <button class="filter-tab" data-filter="dinner">晚餐</button>
+                </div>
+                <div class="food-list" id="foodList"></div>
+            </section>
+        </main>
+
+        <footer>
+            <p>早睡</p>
+        </footer>
+    </div>
+
+    <script type="module" src="main.js"></script>
+</body>
+</html>

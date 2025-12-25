@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>食物抽奖机</title>
+    <style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 50%, #90caf9 100%);
+    min-height: 100vh;
+    color: #1565c0;
+    padding: 15px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.container {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 20px 10px;
+}
+
+header h1 {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    color: #1565c0;
+    text-shadow: 0 2px 10px rgba(21, 101, 192, 0.3);
+}
+
+.subtitle {
+    font-size: 0.95rem;
+    color: #1976d2;
+    opacity: 0.9;
+}
+
+main {
+    display: grid;
+    gap: 15px;
+}
+
+/* 抽奖区域 */
+.lottery-section {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(21, 101, 192, 0.2);
+    border-radius: 15px;
+    padding: 20px 15px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(21, 101, 192, 0.1);
+}
+
+.lottery-display {
+    margin-bottom: 20px;
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1000px;
+    perspective-origin: center center;
+}
+
+.food-card {
+    background: transparent;
+    border: none;
+    border-radius: 12px;
+    padding: 25px 20px;
+    width: 100%;
+    max-width: 280px;
+    transition: all 0.3s ease;
+    transform-style: preserve-3d;
+    position: relative;
+}
+
+.food-card.spinning {
+    animation: spin3d 0.15s linear infinite;
+    border-color: transparent;
+    box-shadow: none;
+    transform-style: preserve-3d;
+}
+
+.food-card.result {
+    animation: popIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    border-color: transparent;
+    box-shadow: none;
+}
+
+@keyframes spin3d {
+    0% { 
+        transform: rotateY(0deg) rotateX(0deg);
+    }
+    25% {
+        transform: rotateY(90deg) rotateX(5deg);
+    }
+    50% {
+        transform: rotateY(180deg) rotateX(0deg);
+    }
+    75% {
+        transform: rotateY(270deg) rotateX(-5deg);
+    }
+    100% { 
+        transform: rotateY(360deg) rotateX(0deg);
+    }
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0) rotateZ(-180deg);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2) rotateZ(10deg);
+    }
+    70% {
+        transform: scale(0.9) rotateZ(-5deg);
+    }
+    100% {
+        transform: scale(1) rotateZ(0deg);
+        opacity: 1;
+    }
+}
+
+.food-icon {
+    font-size: 4rem;
+    margin-bottom: 12px;
+    display: inline-block;
+    transform-style: preserve-3d;
+    filter: drop-shadow(0 4px 8px rgba(21, 101, 192, 0.2));
+}
+
+.spinning .food-icon {
+    animation: float3d 0.15s ease-in-out infinite;
+}
+
+.result .food-icon {
+    animation: slowRotate3d 4s linear infinite;
+}
+
+@keyframes slowRotate3d {
+    0% {
+        transform: rotateY(0deg) rotateX(0deg);
+    }
+    25% {
+        transform: rotateY(90deg) rotateX(5deg);
+    }
+    50% {
+        transform: rotateY(180deg) rotateX(0deg);
+    }
+    75% {
+        transform: rotateY(270deg) rotateX(-5deg);
+    }
+    100% {
+        transform: rotateY(360deg) rotateX(0deg);
+    }
+}
+
+@keyframes float3d {
+    0%, 100% {
+        transform: translateY(0) translateZ(0) rotateX(0deg);
+    }
+    50% {
+        transform: translateY(-10px) translateZ(20px) rotateX(10deg);
+    }
+}
+
+@keyframes bounce3d {
+    0% {
+        transform: translateY(-200px) translateZ(-100px) rotateZ(-180deg) scale(0);
+        opacity: 0;
+    }
+    40% {
+        transform: translateY(0) translateZ(50px) rotateZ(0deg) scale(1.3);
+        opacity: 1;
+    }
+    60% {
+        transform: translateY(-20px) translateZ(30px) rotateZ(5deg) scale(1.1);
+    }
+    80% {
+        transform: translateY(0) translateZ(10px) rotateZ(-3deg) scale(0.95);
+    }
+    100% {
+        transform: translateY(0) translateZ(0) rotateZ(0deg) scale(1);
+        opacity: 1;
+    }
+}
+
+.food-name {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #1565c0;
+    margin-bottom: 8px;
+}
+
+.food-tags {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.food-tag {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: none;
+}
+
+.food-tag.breakfast {
+    background: rgba(255, 152, 0, 0.35);
+    color: #e65100;
+    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.2);
+}
+
+.food-tag.lunch {
+    background: rgba(76, 175, 80, 0.35);
+    color: #2e7d32;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+}
+
+.food-tag.dinner {
+    background: rgba(3, 169, 244, 0.35);
+    color: #01579b;
+    box-shadow: 0 2px 8px rgba(3, 169, 244, 0.2);
+}
+
+.lottery-btn {
+    background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+    color: white;
+    border: none;
+    padding: 14px 40px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(30, 136, 229, 0.4);
+    width: 100%;
+    max-width: 280px;
+    touch-action: manipulation;
+}
+
+.lottery-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(30, 136, 229, 0.6);
+}
+
+.lottery-btn:active {
+    transform: translateY(0);
+}
+
+.lottery-btn:disabled {
+    background: linear-gradient(135deg, #546e7a 0%, #455a64 100%);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.current-time {
+    margin-top: 15px;
+    font-size: 0.85rem;
+    color: #1976d2;
+    opacity: 0.8;
+}
+
+/* 添加食物区域 */
+.add-section {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(21, 101, 192, 0.2);
+    border-radius: 15px;
+    padding: 20px 15px;
+    box-shadow: 0 4px 20px rgba(21, 101, 192, 0.1);
+}
+
+.add-section h2 {
+    color: #1565c0;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.add-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#foodInput {
+    background: rgba(255, 255, 255, 0.5);
+    border: 2px solid rgba(21, 101, 192, 0.3);
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 0.95rem;
+    color: #1565c0;
+    transition: all 0.3s ease;
+}
+
+#foodInput:focus {
+    outline: none;
+    border-color: #1976d2;
+    box-shadow: 0 0 15px rgba(25, 118, 210, 0.3);
+    background: rgba(255, 255, 255, 0.8);
+}
+
+#foodInput::placeholder {
+    color: rgba(21, 101, 192, 0.5);
+}
+
+.tags-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.tag-checkbox {
+    cursor: pointer;
+}
+
+.tag-checkbox input[type="checkbox"] {
+    display: none;
+}
+
+.tag-label {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 18px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    touch-action: manipulation;
+}
+
+.tag-label.breakfast {
+    background: rgba(255, 152, 0, 0.25);
+    color: #e65100;
+    border: none;
+}
+
+.tag-label.lunch {
+    background: rgba(76, 175, 80, 0.25);
+    color: #2e7d32;
+    border: none;
+}
+
+.tag-label.dinner {
+    background: rgba(3, 169, 244, 0.25);
+    color: #01579b;
+    border: none;
+}
+
+.tag-checkbox input[type="checkbox"]:checked + .tag-label {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px currentColor;
+}
+
+.tag-checkbox input[type="checkbox"]:checked + .tag-label.breakfast {
+    background: rgba(255, 152, 0, 0.5);
+}
+
+.tag-checkbox input[type="checkbox"]:checked + .tag-label.lunch {
+    background: rgba(76, 175, 80, 0.5);
+}
+
+.tag-checkbox input[type="checkbox"]:checked + .tag-label.dinner {
+    background: rgba(3, 169, 244, 0.5);
+}
+
+.add-btn {
+    background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    touch-action: manipulation;
+}
+
+.add-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(30, 136, 229, 0.4);
+}
+
+/* 食物列表区域 */
+.food-list-section {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(21, 101, 192, 0.2);
+    border-radius: 15px;
+    padding: 20px 15px;
+    box-shadow: 0 4px 20px rgba(21, 101, 192, 0.1);
+}
+
+.food-list-section h2 {
+    color: #1565c0;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.filter-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.filter-tab {
+    background: rgba(255, 255, 255, 0.5);
+    color: #1565c0;
+    border: 2px solid rgba(21, 101, 192, 0.3);
+    padding: 8px 16px;
+    border-radius: 18px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    touch-action: manipulation;
+}
+
+.filter-tab:hover {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: #1976d2;
+}
+
+.filter-tab.active {
+    background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+    color: white;
+    border-color: #1e88e5;
+}
+
+.food-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.food-item {
+    background: rgba(255, 255, 255, 0.6);
+    border: 2px solid rgba(21, 101, 192, 0.2);
+    border-radius: 12px;
+    padding: 15px;
+    transition: all 0.3s ease;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.food-item:hover {
+    transform: translateY(-3px);
+    border-color: #1976d2;
+    box-shadow: 0 5px 20px rgba(25, 118, 210, 0.3);
+}
+
+.food-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.food-item-name {
+    font-size: 1.05rem;
+    font-weight: bold;
+    color: #1565c0;
+}
+
+.delete-btn {
+    background: rgba(156, 39, 176, 0.15);
+    color: #7b1fa2;
+    border: 1px solid rgba(156, 39, 176, 0.3);
+    padding: 2px 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    transition: all 0.3s ease;
+    touch-action: manipulation;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-btn:hover {
+    background: rgba(156, 39, 176, 0.25);
+    color: #6a1b9a;
+    border-color: rgba(156, 39, 176, 0.5);
+    transform: scale(1.1);
+}
+
+.food-item-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.empty-message {
+    text-align: center;
+    padding: 30px;
+    color: #1976d2;
+    font-size: 0.95rem;
+    opacity: 0.7;
+}
+
+footer {
+    text-align: center;
+    margin-top: 20px;
+    padding: 15px;
+    color: #1976d2;
+    opacity: 0.8;
+    font-size: 0.85rem;
+}
+
+footer a {
+    text-decoration: none;
+    font-weight: bold;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2rem;
+    }
+
+    .lottery-section {
+        padding: 20px;
+    }
+
+    .food-card {
+        min-width: 200px;
+        padding: 30px;
+    }
+
+    .food-icon {
+        font-size: 3rem;
+    }
+
+    .food-name {
+        font-size: 1.4rem;
+    }
+
+    .lottery-btn {
+        padding: 15px 40px;
+        font-size: 1.1rem;
+    }
+
+    .food-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 大屏幕优化 */
+@media (min-width: 768px) {
+    .container {
+        max-width: 600px;
+    }
+    
+    .food-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍽️ CZX</h1>
+            <h1>Lottery Machine</h1>
+            <p class="subtitle">叮！美食机已加载完成</p>
+        </header>
+
+        <main>
+            <!-- 抽奖区域 -->
+            <section class="lottery-section">
+                <div class="lottery-display">
+                    <div class="food-card" id="lotteryCard">
+                        <div class="food-icon">🍴</div>
+                        <div class="food-name">Food</div>
+                    </div>
+                </div>
+                <button class="lottery-btn" id="lotteryBtn">
+                    <span class="btn-text">抽取</span>
+                </button>
+                <div class="current-time" id="currentTime"></div>
+            </section>
+
+            <!-- 添加食物区域 -->
+            <section class="add-section">
+                <div class="add-form">
+                    <input type="text" id="foodInput" placeholder="输入食物名称" maxlength="20">
+                    <div class="tags-group">
+                        <label class="tag-checkbox">
+                            <input type="checkbox" value="breakfast">
+                            <span class="tag-label breakfast">早餐</span>
+                        </label>
+                        <label class="tag-checkbox">
+                            <input type="checkbox" value="lunch">
+                            <span class="tag-label lunch">中餐</span>
+                        </label>
+                        <label class="tag-checkbox">
+                            <input type="checkbox" value="dinner">
+                            <span class="tag-label dinner">晚餐</span>
+                        </label>
+                    </div>
+                    <button class="add-btn" id="addBtn">添加食物</button>
+                </div>
+            </section>
+
+            <!-- 食物列表区域 -->
+            <section class="food-list-section">
+                <h2>美食列表</h2>
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-filter="all">全部</button>
+                    <button class="filter-tab" data-filter="breakfast">早餐</button>
+                    <button class="filter-tab" data-filter="lunch">中餐</button>
+                    <button class="filter-tab" data-filter="dinner">晚餐</button>
+                </div>
+                <div class="food-list" id="foodList"></div>
+            </section>
+        </main>
+    </div>
+
+    <script type="module">
+// 食物数据管理
+class FoodManager {
+    constructor() {
+        this.foods = this.loadFoods();
+        this.currentFilter = 'all';
+    }
+
+    loadFoods() {
+        const saved = localStorage.getItem('foods');
+        if (saved) {
+            return JSON.parse(saved);
+        }
+        // 默认食物数据
+        return [
+            { id: 1, name: '豆浆油条', tags: ['breakfast'] },
+            { id: 2, name: '煎饼果子', tags: ['breakfast'] },
+            { id: 3, name: '包子馒头', tags: ['breakfast'] },
+            { id: 4, name: '牛肉面', tags: ['breakfast', 'lunch', 'dinner'] },
+            { id: 5, name: '宫保鸡丁', tags: ['lunch', 'dinner'] },
+            { id: 6, name: '麻婆豆腐', tags: ['lunch', 'dinner'] },
+            { id: 7, name: '红烧肉', tags: ['lunch', 'dinner'] },
+            { id: 8, name: '水煮鱼', tags: ['lunch', 'dinner'] },
+            { id: 9, name: '炒饭', tags: ['lunch', 'dinner'] },
+            { id: 10, name: '火锅', tags: ['dinner'] },
+            { id: 11, name: '烧烤', tags: ['dinner'] },
+            { id: 12, name: '披萨', tags: ['lunch', 'dinner'] }
+        ];
+    }
+
+    saveFoods() {
+        localStorage.setItem('foods', JSON.stringify(this.foods));
+    }
+
+    addFood(name, tags) {
+        if (!name || name.trim() === '') {
+            return false;
+        }
+        
+        // 如果没有选择标签，默认包含所有标签
+        if (!tags || tags.length === 0) {
+            tags = ['breakfast', 'lunch', 'dinner'];
+        }
+
+        const newFood = {
+            id: Date.now(),
+            name: name.trim(),
+            tags: tags
+        };
+
+        this.foods.push(newFood);
+        this.saveFoods();
+        return true;
+    }
+
+    deleteFood(id) {
+        this.foods = this.foods.filter(food => food.id !== id);
+        this.saveFoods();
+    }
+
+    getFoodsByTag(tag) {
+        if (tag === 'all') {
+            return this.foods;
+        }
+        return this.foods.filter(food => food.tags.includes(tag));
+    }
+
+    getCurrentTimePeriod() {
+        const hour = new Date().getHours();
+        if (hour >= 6 && hour < 10) {
+            return 'breakfast';
+        } else if (hour >= 10 && hour < 16) {
+            return 'lunch';
+        } else {
+            return 'dinner';
+        }
+    }
+
+    getFoodsForCurrentTime() {
+        const period = this.getCurrentTimePeriod();
+        return this.foods.filter(food => food.tags.includes(period));
+    }
+
+    getRandomFood(foods) {
+        if (!foods || foods.length === 0) {
+            return null;
+        }
+        const randomIndex = Math.floor(Math.random() * foods.length);
+        return foods[randomIndex];
+    }
+}
+
+// UI管理
+class UIManager {
+    constructor(foodManager) {
+        this.foodManager = foodManager;
+        this.isLotterying = false;
+        this.initElements();
+        this.bindEvents();
+        this.updateTime();
+        this.renderFoodList();
+    }
+
+    initElements() {
+        this.lotteryBtn = document.getElementById('lotteryBtn');
+        this.lotteryCard = document.getElementById('lotteryCard');
+        this.foodInput = document.getElementById('foodInput');
+        this.addBtn = document.getElementById('addBtn');
+        this.foodList = document.getElementById('foodList');
+        this.currentTime = document.getElementById('currentTime');
+        this.filterTabs = document.querySelectorAll('.filter-tab');
+        this.tagCheckboxes = document.querySelectorAll('.tag-checkbox input[type="checkbox"]');
+    }
+
+    bindEvents() {
+        this.lotteryBtn.addEventListener('click', () => this.startLottery());
+        this.addBtn.addEventListener('click', () => this.addFood());
+        this.foodInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                this.addFood();
+            }
+        });
+
+        this.filterTabs.forEach(tab => {
+            tab.addEventListener('click', () => this.filterFoods(tab.dataset.filter));
+        });
+    }
+
+    updateTime() {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('zh-CN', { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        const period = this.foodManager.getCurrentTimePeriod();
+        const periodText = {
+            'breakfast': '早餐时段',
+            'lunch': '中餐时段',
+            'dinner': '晚餐时段'
+        };
+        
+        this.currentTime.textContent = `当前时间：${timeStr} | ${periodText[period]}`;
+        setTimeout(() => this.updateTime(), 1000);
+    }
+
+    startLottery() {
+        if (this.isLotterying) {
+            return;
+        }
+
+        const availableFoods = this.foodManager.getFoodsForCurrentTime();
+        
+        if (availableFoods.length === 0) {
+            alert('当前时段没有可抽取的食物，请先添加食物！');
+            return;
+        }
+
+        this.isLotterying = true;
+        this.lotteryBtn.disabled = true;
+        this.lotteryBtn.querySelector('.btn-text').textContent = '抽取中...';
+        
+        // 移除之前的result类，开始新的抽奖
+        this.lotteryCard.classList.remove('result');
+        
+        // 开始旋转动画
+        this.lotteryCard.classList.add('spinning');
+        
+        let count = 0;
+        const maxCount = 20;
+        const interval = setInterval(() => {
+            const randomFood = this.foodManager.getRandomFood(availableFoods);
+            this.updateLotteryCard(randomFood, false);
+            
+            count++;
+            if (count >= maxCount) {
+                clearInterval(interval);
+                this.finishLottery(availableFoods);
+            }
+        }, 100);
+    }
+
+    finishLottery(availableFoods) {
+        setTimeout(() => {
+            const finalFood = this.foodManager.getRandomFood(availableFoods);
+            this.lotteryCard.classList.remove('spinning');
+            this.lotteryCard.classList.add('result');
+            this.updateLotteryCard(finalFood, true);
+            
+            // 添加粒子爆炸效果
+            this.createParticleExplosion();
+            
+            // 不移除result类，让3D旋转动画持续
+            setTimeout(() => {
+                this.isLotterying = false;
+                this.lotteryBtn.disabled = false;
+                this.lotteryBtn.querySelector('.btn-text').textContent = '开始抽奖';
+            }, 2000);
+        }, 500);
+    }
+
+    createParticleExplosion() {
+        const colors = ['#4fc3f7', '#00e676', '#ffd54f', '#ff4081', '#7c4dff'];
+        const particleCount = 20;
+        
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.style.cssText = `
+                position: fixed;
+                width: 8px;
+                height: 8px;
+                background: ${colors[Math.floor(Math.random() * colors.length)]};
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 9999;
+                box-shadow: 0 0 10px currentColor;
+            `;
+            
+            const rect = this.lotteryCard.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            particle.style.left = centerX + 'px';
+            particle.style.top = centerY + 'px';
+            
+            document.body.appendChild(particle);
+            
+            const angle = (Math.PI * 2 * i) / particleCount;
+            const velocity = 100 + Math.random() * 100;
+            const tx = Math.cos(angle) * velocity;
+            const ty = Math.sin(angle) * velocity;
+            
+            particle.animate([
+                { 
+                    transform: 'translate(0, 0) scale(1)',
+                    opacity: 1
+                },
+                { 
+                    transform: `translate(${tx}px, ${ty}px) scale(0)`,
+                    opacity: 0
+                }
+            ], {
+                duration: 800,
+                easing: 'cubic-bezier(0.4, 0.0, 0.6, 1)'
+            }).onfinish = () => particle.remove();
+        }
+    }
+
+    updateLotteryCard(food, showTags) {
+        // 使用可爱的卡通风格食物图标
+        const foodIcons = ['🍜', '🍱', '🍛', '🍝', '🍕', '🍔', '🌮', '🌯', '🥗', '🥙', '🍲', '🍳', '🥘', '🍣', '🍤', '🥟', '🍙', '🍘', '🥠', '🍢'];
+        const randomIcon = foodIcons[Math.floor(Math.random() * foodIcons.length)];
+        
+        let html = `
+            <div class="food-icon">${randomIcon}</div>
+            <div class="food-name">${food.name}</div>
+        `;
+        
+        if (showTags && food.tags.length > 0) {
+            html += '<div class="food-tags">';
+            food.tags.forEach(tag => {
+                const tagText = {
+                    'breakfast': '早餐',
+                    'lunch': '中餐',
+                    'dinner': '晚餐'
+                };
+                html += `<span class="food-tag ${tag}">${tagText[tag]}</span>`;
+            });
+            html += '</div>';
+        }
+        
+        this.lotteryCard.innerHTML = html;
+    }
+
+    addFood() {
+        const name = this.foodInput.value.trim();
+        if (!name) {
+            alert('请输入食物名称！');
+            return;
+        }
+
+        const selectedTags = Array.from(this.tagCheckboxes)
+            .filter(cb => cb.checked)
+            .map(cb => cb.value);
+
+        if (this.foodManager.addFood(name, selectedTags)) {
+            this.foodInput.value = '';
+            this.tagCheckboxes.forEach(cb => cb.checked = false);
+            this.renderFoodList();
+            
+            // 显示成功提示
+            this.showToast('添加成功！');
+        }
+    }
+
+    showToast(message) {
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(30, 136, 229, 0.4);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        `;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 2000);
+    }
+
+    filterFoods(filter) {
+        this.foodManager.currentFilter = filter;
+        
+        this.filterTabs.forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.filter === filter);
+        });
+        
+        this.renderFoodList();
+    }
+
+    renderFoodList() {
+        const foods = this.foodManager.getFoodsByTag(this.foodManager.currentFilter);
+        
+        if (foods.length === 0) {
+            this.foodList.innerHTML = '<div class="empty-message">暂无食物，快去添加吧！</div>';
+            return;
+        }
+
+        this.foodList.innerHTML = foods.map(food => this.createFoodItemHTML(food)).join('');
+        
+        // 绑定删除按钮事件
+        this.foodList.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(e.target.dataset.id);
+                if (confirm('确定要删除这个食物吗？')) {
+                    this.foodManager.deleteFood(id);
+                    this.renderFoodList();
+                }
+            });
+        });
+    }
+
+    createFoodItemHTML(food) {
+        const tagText = {
+            'breakfast': '早餐',
+            'lunch': '中餐',
+            'dinner': '晚餐'
+        };
+
+        const tagsHTML = food.tags.map(tag => 
+            `<span class="food-tag ${tag}">${tagText[tag]}</span>`
+        ).join('');
+
+        return `
+            <div class="food-item">
+                <div class="food-item-header">
+                    <div class="food-item-name">${food.name}</div>
+                    <button class="delete-btn" data-id="${food.id}">×</button>
+                </div>
+                <div class="food-item-tags">${tagsHTML}</div>
+            </div>
+        `;
+    }
+}
+
+// 添加动画样式
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);
+
+// 初始化应用
+const foodManager = new FoodManager();
+const uiManager = new UIManager(foodManager);
+
+export { foodManager, uiManager };
+    </script>
+</body>
+</html>
